@@ -13,7 +13,11 @@ func main() {
 		w.Write([]byte("Hello LinkPulse"))
 	})
 
-	log.Println("ShortLink server running on http://localhost:8080")
+	log.Println("LinkPulse server running on http://localhost:8080")
 
 	http.ListenAndServe(":8080", r)
+
+	if err := http.ListenAndServe(":8080", r); err != nil {
+		log.Fatal(err)
+	}
 }
