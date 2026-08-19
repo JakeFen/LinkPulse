@@ -4,9 +4,12 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
+
+	"github.com/jackc/pgx/v5"
 )
 
 type LinksRequest struct {
@@ -73,7 +76,10 @@ func (h Handler) RedirectLinks(w http.ResponseWriter, r *http.Request) {
 		shortCode,
 	).Scan(&originalURL)
 
-	// TODO: Need to error if link doesn't exist or if DB actually fails
+	if errors.Is(dbErr, pgx.ErrNoRows) {
+		http.Error(w, "Short link not found", http.StatusNotFound)
+	}
+
 	if dbErr != nil {
 		http.Error(w, "Failed to find original URL", http.StatusInternalServerError)
 		return
