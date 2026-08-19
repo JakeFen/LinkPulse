@@ -1,9 +1,12 @@
 package handlers
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"net/url"
 )
 
 type LinksRequest struct {
@@ -15,7 +18,7 @@ type LinksResponse struct {
 	ShortLink string `json:"shortLink"`
 }
 
-func CreateLinks(w http.ResponseWriter, r *http.Request) {
+func (h Handler) CreateLinks(w http.ResponseWriter, r *http.Request) {
 	var request LinksRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
 	// Check for error
@@ -29,10 +32,25 @@ func CreateLinks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if err := ValidateURL(request.URL); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	shortCode, shortCodeErr := GenerateRandomCode(6)
 
 	if shortCodeErr != nil {
 		http.Error(w, "Failed to generate short code", http.StatusInternalServerError)
+		return
+	}
+
+	_, dbErr := h.DB.Exec(context.Background(), "INSERT INTO links (short_code, original_url) VALUES ($1, $2)",
+		shortCode,
+		request.URL,
+	)
+
+	if dbErr != nil {
+		http.Error(w, "Failed to save link", http.StatusInternalServerError)
 		return
 	}
 
@@ -42,6 +60,26 @@ func CreateLinks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(response)
+}
+
+func (h Handler) RedirectLinks(w http.ResponseWriter, r *http.Request) {
+	shortCode := r.PathValue("shortCode")
+
+	var originalURL string
+
+	dbErr := h.DB.QueryRow(
+		context.Background(),
+		`SELECT original_url FROM links WHERE short_code = $1`,
+		shortCode,
+	).Scan(&originalURL)
+
+	// TODO: Need to error if link doesn't exist or if DB actually fails
+	if dbErr != nil {
+		http.Error(w, "Failed to find original URL", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, originalURL, http.StatusFound)
 }
 
 func GenerateRandomCode(codeLength int) (string, error) {
@@ -64,4 +102,18 @@ func GenerateRandomCode(codeLength int) (string, error) {
 	}
 
 	return string(result), nil
+}
+
+func ValidateURL(uncheckedURL string) error {
+	parseURL, urlErr := url.Parse(uncheckedURL)
+
+	if urlErr != nil || parseURL.Host == "" {
+		return fmt.Errorf("invalid URL")
+	}
+
+	if parseURL.Scheme != "http" && parseURL.Scheme != "https" {
+		return fmt.Errorf("URL must contain http or https")
+	}
+
+	return nil
 }
