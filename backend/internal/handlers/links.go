@@ -1,5 +1,11 @@
 package handlers
 
+// TODO: short_code protection in the DB?
+// Make sure LinksResponse has appropriate JSON tags.
+// Return an explicit status code from CreateLinks.
+// Set Content-Type: application/json.
+// Make sure http.ListenAndServe errors are handled.
+
 import (
 	"context"
 	"crypto/rand"
