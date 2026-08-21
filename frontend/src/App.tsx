@@ -1,14 +1,18 @@
-import { useState } from "react";
 import "./App.css";
 import Home from "./pages/home/Home";
+import Dashboard from "./pages/dashboard/Dashboard";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
       <div className="bg-slate-50 min-h-screen">
-        <Home></Home>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />}></Route>
+            <Route path="/dashboard" element={<Dashboard />}></Route>
+          </Routes>
+        </BrowserRouter>
       </div>
     </>
   );
