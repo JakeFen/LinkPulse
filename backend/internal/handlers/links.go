@@ -96,7 +96,10 @@ func (h Handler) RedirectLinks(w http.ResponseWriter, r *http.Request) {
 
 	dbErr := h.DB.QueryRow(
 		context.Background(),
-		`SELECT original_url FROM links WHERE short_code = $1`,
+		`UPDATE links
+		SET clicks = clicks + 1
+		WHERE short_code = $1
+		RETURNING original_url`,
 		shortCode,
 	).Scan(&originalURL)
 
