@@ -2,6 +2,7 @@ import { useState } from "react";
 import NavBar from "../../components/NavBar";
 import createLink from "../../services/linkService";
 import type { linkResponse } from "../../types/link";
+import { useAuth } from "@clerk/react";
 
 const Home = () => {
   const [longURL, setLongURL] = useState("");
@@ -9,6 +10,7 @@ const Home = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { getToken } = useAuth();
 
   const shortenLink = async (event) => {
     event.preventDefault();
@@ -16,8 +18,10 @@ const Home = () => {
     setErrorMessage("");
     setIsLoading(true);
 
+    const token = await getToken();
+
     try {
-      const response: linkResponse = await createLink(longURL);
+      const response: linkResponse = await createLink(longURL, token);
       setShortURL(response.shortLink);
       setIsLoading(false);
     } catch (err) {
