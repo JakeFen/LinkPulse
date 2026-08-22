@@ -4,7 +4,6 @@ const createLink = async (
   longURL: string,
   token: string
 ): Promise<linkResponse> => {
-  console.log("token: ", token);
   const response = await fetch("/api/links", {
     method: "POST",
     headers: {

@@ -18,18 +18,17 @@ const Home = () => {
     setErrorMessage("");
     setIsLoading(true);
 
-    const token = await getToken();
-
     try {
+      const token = await getToken();
+
+      if (!token) throw new Error("You must be logged in to shorten a link.");
+
       const response: linkResponse = await createLink(longURL, token);
       setShortURL(response.shortLink);
-      setIsLoading(false);
     } catch (err) {
-      if (err instanceof Error) {
-        setErrorMessage(err.message);
-      } else {
-        setErrorMessage("Something went wrong");
-      }
+      if (err instanceof Error) setErrorMessage(err.message);
+      else setErrorMessage("Something went wrong");
+    } finally {
       setIsLoading(false);
     }
   };
