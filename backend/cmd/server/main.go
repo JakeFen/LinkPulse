@@ -49,7 +49,10 @@ func main() {
 	// Each route maps an HTTP method + URL to a handler function.
 	r.Get("/", handlers.Home)
 	r.Get("/health", handlers.Health)
+
 	r.With(auth.Middleware).Post("/api/links", handler.CreateLinks)
+	r.With(auth.Middleware).Get("/api/links", handler.GetLinksByProviderID)
+
 	r.Get("/{shortCode}", handler.RedirectLinks)
 
 	// Start the HTTP server and give it our router.

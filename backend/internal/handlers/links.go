@@ -14,6 +14,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/JakeFen/LinkPulse/backend/internal/database"
 	"github.com/clerk/clerk-sdk-go/v2"
@@ -25,8 +26,11 @@ type LinksRequest struct {
 }
 
 type LinksResponse struct {
-	ShortCode string `json:"shortCode"`
-	ShortLink string `json:"shortLink"`
+	ID          int       `json:"id"`
+	ShortCode   string    `json:"shortCode"`
+	ShortLink   string    `json:"shortLink"`
+	OriginalURL string    `json:"originalUrl"`
+	CreatedAt   time.Time `json:"createAt"`
 }
 
 func (h Handler) CreateLinks(w http.ResponseWriter, r *http.Request) {
@@ -107,6 +111,82 @@ func (h Handler) RedirectLinks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Redirect(w, r, originalURL, http.StatusFound)
+}
+
+func (h Handler) GetLinksByProviderID(w http.ResponseWriter, r *http.Request) {
+	// Get providerID
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	providerID := claims.Subject
+
+	// Get UserID
+	userID, userIDErr := h.getUser(providerID)
+
+	if userIDErr != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	rows, rowsErr := h.DB.Query(
+		context.Background(), `
+		SELECT id, short_code, original_url, created_at 
+		FROM links 
+		WHERE user_id = $1
+		ORDER BY created_at DESC`,
+		userID,
+	)
+
+	if rowsErr != nil {
+		http.Error(w, "Failed to retrieve links", http.StatusInternalServerError)
+		return
+	}
+
+	defer rows.Close()
+
+	var links []LinksResponse
+
+	for rows.Next() {
+		var link LinksResponse
+
+		if err := rows.Scan(
+			&link.ID,
+			&link.ShortCode,
+			&link.OriginalURL,
+			&link.CreatedAt,
+		); err != nil {
+			http.Error(w, "Failed to read links", http.StatusInternalServerError)
+			return
+		}
+
+		link.ShortLink = "http://localhost:8080/" + link.ShortCode
+
+		links = append(links, link)
+	}
+
+	if err := rows.Err(); err != nil {
+		http.Error(w, "Failed to read links", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(links)
+}
+
+func (h Handler) getUser(providerID string) (int, error) {
+	var userID int
+
+	queryErr := h.DB.QueryRow(context.Background(), "SELECT id FROM users WHERE provider_id = $1", providerID).Scan(&userID)
+
+	if queryErr != nil {
+		return 0, queryErr
+	}
+
+	return userID, nil
 }
 
 func GenerateRandomCode(codeLength int) (string, error) {
