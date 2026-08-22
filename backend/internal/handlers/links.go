@@ -25,12 +25,23 @@ type LinksRequest struct {
 	URL string `json:"url"`
 }
 
+type DashboardResponse struct {
+	Links []LinksResponse `json:"links"`
+	Stats LinkStats       `json:"stats"`
+}
+
 type LinksResponse struct {
 	ID          int       `json:"id"`
 	ShortCode   string    `json:"shortCode"`
 	ShortLink   string    `json:"shortLink"`
 	OriginalURL string    `json:"originalUrl"`
+	Clicks      int       `json:"clicks"`
 	CreatedAt   time.Time `json:"createAt"`
+}
+
+type LinkStats struct {
+	TotalLinks  int `json:"totalLinks"`
+	TotalClicks int `json:"totalClicks"`
 }
 
 func (h Handler) CreateLinks(w http.ResponseWriter, r *http.Request) {
@@ -137,7 +148,7 @@ func (h Handler) GetLinksByProviderID(w http.ResponseWriter, r *http.Request) {
 
 	rows, rowsErr := h.DB.Query(
 		context.Background(), `
-		SELECT id, short_code, original_url, created_at 
+		SELECT id, short_code, original_url, clicks, created_at 
 		FROM links 
 		WHERE user_id = $1
 		ORDER BY created_at DESC`,
@@ -152,6 +163,7 @@ func (h Handler) GetLinksByProviderID(w http.ResponseWriter, r *http.Request) {
 	defer rows.Close()
 
 	var links []LinksResponse
+	var stats LinkStats
 
 	for rows.Next() {
 		var link LinksResponse
@@ -160,6 +172,7 @@ func (h Handler) GetLinksByProviderID(w http.ResponseWriter, r *http.Request) {
 			&link.ID,
 			&link.ShortCode,
 			&link.OriginalURL,
+			&link.Clicks,
 			&link.CreatedAt,
 		); err != nil {
 			http.Error(w, "Failed to read links", http.StatusInternalServerError)
@@ -167,6 +180,9 @@ func (h Handler) GetLinksByProviderID(w http.ResponseWriter, r *http.Request) {
 		}
 
 		link.ShortLink = "http://localhost:8080/" + link.ShortCode
+
+		stats.TotalLinks++
+		stats.TotalClicks += link.Clicks
 
 		links = append(links, link)
 	}
@@ -176,8 +192,13 @@ func (h Handler) GetLinksByProviderID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	response := DashboardResponse{
+		Links: links,
+		Stats: stats,
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(links)
+	json.NewEncoder(w).Encode(response)
 }
 
 func (h Handler) getUser(providerID string) (int, error) {
