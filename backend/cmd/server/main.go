@@ -4,13 +4,23 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/JakeFen/LinkPulse/backend/internal/auth"
 	"github.com/JakeFen/LinkPulse/backend/internal/database"
 	"github.com/JakeFen/LinkPulse/backend/internal/handlers"
+	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/go-chi/chi/v5"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
+	}
+
+	clerk.SetKey(os.Getenv("CLERK_SECRET_KEY"))
+
 	// Create the HTTP router that will receive incoming requests
 	r := chi.NewRouter()
 
@@ -39,7 +49,7 @@ func main() {
 	// Each route maps an HTTP method + URL to a handler function.
 	r.Get("/", handlers.Home)
 	r.Get("/health", handlers.Health)
-	r.Post("/api/links", handler.CreateLinks)
+	r.With(auth.Middleware).Post("/api/links", handler.CreateLinks)
 	r.Get("/{shortCode}", handler.RedirectLinks)
 
 	// Start the HTTP server and give it our router.

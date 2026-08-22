@@ -15,6 +15,8 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/JakeFen/LinkPulse/backend/internal/database"
+	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/jackc/pgx/v5"
 )
 
@@ -30,6 +32,7 @@ type LinksResponse struct {
 func (h Handler) CreateLinks(w http.ResponseWriter, r *http.Request) {
 	var request LinksRequest
 	err := json.NewDecoder(r.Body).Decode(&request)
+
 	// Check for error
 	if err != nil {
 		http.Error(w, "Invalid JSON", http.StatusBadRequest)
@@ -46,6 +49,16 @@ func (h Handler) CreateLinks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	clerkID := claims.Subject
+	userID, err := database.GetOrCreateUser(h.DB, clerkID)
+
 	shortCode, shortCodeErr := GenerateRandomCode(6)
 
 	if shortCodeErr != nil {
@@ -53,9 +66,10 @@ func (h Handler) CreateLinks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, dbErr := h.DB.Exec(context.Background(), "INSERT INTO links (short_code, original_url) VALUES ($1, $2)",
+	_, dbErr := h.DB.Exec(context.Background(), "INSERT INTO links (short_code, original_url, user_id) VALUES ($1, $2, $3)",
 		shortCode,
 		request.URL,
+		userID,
 	)
 
 	if dbErr != nil {
@@ -84,6 +98,7 @@ func (h Handler) RedirectLinks(w http.ResponseWriter, r *http.Request) {
 
 	if errors.Is(dbErr, pgx.ErrNoRows) {
 		http.Error(w, "Short link not found", http.StatusNotFound)
+		return
 	}
 
 	if dbErr != nil {
