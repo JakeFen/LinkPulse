@@ -1,9 +1,9 @@
-import type { linkResponse } from "../types/link";
+import type { Link, LinkResponse } from "../types/link";
 
-const createLink = async (
+export const createLink = async (
   longURL: string,
   token: string
-): Promise<linkResponse> => {
+): Promise<Link> => {
   const response = await fetch("/api/links", {
     method: "POST",
     headers: {
@@ -21,4 +21,17 @@ const createLink = async (
   return response.json();
 };
 
-export default createLink;
+export const getLinks = async (token): Promise<LinkResponse> => {
+  const response = await fetch("/api/links", {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch links");
+  }
+
+  return response.json();
+};

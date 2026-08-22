@@ -1,7 +1,7 @@
 import { useState } from "react";
 import NavBar from "../../components/NavBar";
-import createLink from "../../services/linkService";
-import type { linkResponse } from "../../types/link";
+import { createLink } from "../../services/linkService";
+import type { Link } from "../../types/link";
 import { useAuth } from "@clerk/react";
 
 const Home = () => {
@@ -23,7 +23,8 @@ const Home = () => {
 
       if (!token) throw new Error("You must be logged in to shorten a link.");
 
-      const response: linkResponse = await createLink(longURL, token);
+      const response: Link = await createLink(longURL, token);
+
       setShortURL(response.shortLink);
     } catch (err) {
       if (err instanceof Error) setErrorMessage(err.message);
