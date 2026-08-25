@@ -21,7 +21,7 @@ export const createLink = async (
   return response.json();
 };
 
-export const getLinks = async (token): Promise<LinkResponse> => {
+export const getLinks = async (token: string): Promise<LinkResponse> => {
   const response = await fetch("/api/links", {
     method: "GET",
     headers: {
@@ -34,4 +34,17 @@ export const getLinks = async (token): Promise<LinkResponse> => {
   }
 
   return response.json();
+};
+
+export const deleteLink = async (token: string, id: number) => {
+  const response = await fetch(`/api/links/${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete links");
+  }
 };

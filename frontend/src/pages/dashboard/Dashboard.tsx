@@ -3,7 +3,7 @@ import NavBar from "../../components/NavBar";
 import { useAuth } from "@clerk/react";
 import { useEffect, useState } from "react";
 import type { LinkResponse } from "../../types/link";
-import { getLinks } from "../../services/linkService";
+import { deleteLink, getLinks } from "../../services/linkService";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState<LinkResponse | null>({
@@ -41,6 +41,28 @@ const Dashboard = () => {
 
     fetchDashboard();
   }, [getToken, setDashboardData]);
+
+  const handleDeleteLink = async (id: number) => {
+    try {
+      const token = await getToken();
+
+      if (!token) throw new Error("You must be logged in to delete a link");
+
+      await deleteLink(token, id);
+
+      setDashboardData((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          links: prev.links.filter((link) => link.id !== id),
+        };
+      });
+    } catch (err) {
+      if (err instanceof Error) setErrorMessage(err.message);
+      else setErrorMessage("Something went wrong");
+    }
+  };
 
   return (
     <div>
@@ -136,7 +158,7 @@ const Dashboard = () => {
                           type="button"
                           className="w-full cursor-pointer px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
                           onClick={() => {
-                            console.log("Delete", link.id);
+                            handleDeleteLink(link.id);
                             setOpenMenu(null);
                           }}
                         >
