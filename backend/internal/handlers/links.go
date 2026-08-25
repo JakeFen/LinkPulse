@@ -213,6 +213,39 @@ func (h Handler) getUser(providerID string) (int, error) {
 	return userID, nil
 }
 
+func (h Handler) DeleteLink(w http.ResponseWriter, r *http.Request) {
+	claims, ok := clerk.SessionClaimsFromContext(r.Context())
+
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	providerID := claims.Subject
+
+	userID, userIDErr := h.getUser(providerID)
+
+	if userIDErr != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	linkID := r.PathValue("id")
+
+	result, err := h.DB.Exec(context.Background(), "DELETE FROM links WHERE id = $1 AND user_id = $2", linkID, userID)
+
+	if err != nil {
+		http.Error(w, "Failed to delete link", http.StatusInternalServerError)
+	}
+
+	if result.RowsAffected() == 0 {
+		http.Error(w, "Link not found", http.StatusNotFound)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func GenerateRandomCode(codeLength int) (string, error) {
 	const characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 

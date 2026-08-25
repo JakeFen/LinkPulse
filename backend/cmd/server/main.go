@@ -52,6 +52,7 @@ func main() {
 
 	r.With(auth.Middleware).Post("/api/links", handler.CreateLinks)
 	r.With(auth.Middleware).Get("/api/links", handler.GetLinksByProviderID)
+	r.With(auth.Middleware).Delete("/api/links/{id}", handler.DeleteLink)
 
 	r.Get("/{shortCode}", handler.RedirectLinks)
 
