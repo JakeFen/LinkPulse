@@ -1,11 +1,11 @@
 import type { Link, LinkResponse } from "../types/link";
 
+const API_URL = import.meta.env.VITE_API_URL || "";
+
 export const createLink = async (
   longURL: string,
   token: string
 ): Promise<Link> => {
-  const API_URL = import.meta.env.VITE_API_URL || "";
-
   const response = await fetch(`${API_URL}/api/links`, {
     method: "POST",
     headers: {
@@ -24,8 +24,6 @@ export const createLink = async (
 };
 
 export const getLinks = async (token: string): Promise<LinkResponse> => {
-  const API_URL = import.meta.env.VITE_API_URL || "";
-
   const response = await fetch(`${API_URL}/api/links`, {
     method: "GET",
     headers: {
@@ -41,7 +39,7 @@ export const getLinks = async (token: string): Promise<LinkResponse> => {
 };
 
 export const deleteLink = async (token: string, id: number) => {
-  const response = await fetch(`/api/links/${id}`, {
+  const response = await fetch(`${API_URL}/api/links/${id}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
