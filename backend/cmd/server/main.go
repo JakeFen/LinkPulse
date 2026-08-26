@@ -58,9 +58,15 @@ func main() {
 
 	// Start the HTTP server and give it our router.
 	// ListenAndServe blocks here while the server is running.
-	log.Println("linkpulse server running on http://localhost:8080")
+	port := os.Getenv("PORT")
 
-	if err := http.ListenAndServe(":8080", r); err != nil {
+	if port == "" {
+		port = "8080"
+	}
+
+	log.Printf("linkpulse server running on port %s", port)
+
+	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
 	}
 }
