@@ -26,7 +26,7 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"https://linkpulse-5gpc44zwo-jake-fen.vercel.app"},
+		AllowedOrigins:   []string{"https://linkpulse-kappa-sooty.vercel.app"},
 		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
 		AllowCredentials: true,
