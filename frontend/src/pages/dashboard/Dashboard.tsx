@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import NavBar from "../../components/NavBar";
 import { useAuth } from "@clerk/react";
 import { useEffect, useState } from "react";
-import type { LinkResponse } from "../../types/link";
+import type { Link as LinkType, LinkResponse } from "../../types/link";
 import { deleteLink, getLinks } from "../../services/linkService";
 
 const Dashboard = () => {
@@ -13,6 +13,7 @@ const Dashboard = () => {
       totalClicks: 0,
     },
   });
+  const [copiedLinkId, setCopiedLinkId] = useState<number | null>(null);
   const [openMenu, setOpenMenu] = useState<number | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -42,6 +43,15 @@ const Dashboard = () => {
     fetchDashboard();
   }, [getToken, setDashboardData]);
 
+  // Close menu when clicking away
+  useEffect(() => {
+    const closeMenu = () => setOpenMenu(null);
+
+    document.addEventListener("click", closeMenu);
+
+    return () => document.removeEventListener("click", closeMenu);
+  }, []);
+
   const handleDeleteLink = async (id: number) => {
     try {
       const token = await getToken();
@@ -62,6 +72,16 @@ const Dashboard = () => {
       if (err instanceof Error) setErrorMessage(err?.message);
       else setErrorMessage("Something went wrong");
     }
+  };
+
+  
+  const copyLink = async (link: LinkType) => {
+    await navigator.clipboard.writeText(link.shortLink);
+    setCopiedLinkId(link.id);
+
+    setTimeout(() => {
+      setCopiedLinkId(null);
+    }, 2000);
   };
 
   return (
@@ -132,8 +152,31 @@ const Dashboard = () => {
                     {link.originalUrl}
                   </div>
 
-                  <div className="truncate pr-4 text-indigo-600">
-                    {link.shortLink}
+                  <div className="flex min-w-0 items-center gap-1 pr-4">
+                    <a
+                      href={link.shortLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="truncate text-indigo-600 hover:text-indigo-800 hover:underline"
+                    >
+                      {link.shortLink}
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => copyLink(link)}
+                      className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                      title={copiedLinkId === link.id ? "Copied!" : "Copy link"}
+                      aria-label={
+                        copiedLinkId === link.id ? "Copied!" : "Copy link"
+                      }
+                    >
+                      {copiedLinkId === link.id ? (
+                        <span className="text-emerald-600">✓</span>
+                      ) : (
+                        <span>⧉</span>
+                      )}
+                    </button>
                   </div>
 
                   <div className="font-semibold text-slate-800">
@@ -143,9 +186,10 @@ const Dashboard = () => {
                   <div className="relative">
                     <button
                       type="button"
-                      onClick={() =>
-                        setOpenMenu(openMenu === link?.id ? null : link?.id)
-                      }
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setOpenMenu(openMenu === link.id ? null : link.id);
+                      }}
                       className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                       aria-label="Link options"
                     >
