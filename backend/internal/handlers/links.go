@@ -167,7 +167,7 @@ func (h Handler) GetLinksByProviderID(w http.ResponseWriter, r *http.Request) {
 
 	defer rows.Close()
 
-	var links []LinksResponse
+	links := make([]LinksResponse, 0)
 	var stats LinkStats
 
 	for rows.Next() {

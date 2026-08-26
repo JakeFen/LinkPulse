@@ -32,7 +32,7 @@ const Dashboard = () => {
 
         setDashboardData(response);
       } catch (err) {
-        if (err instanceof Error) setErrorMessage(err.message);
+        if (err instanceof Error) setErrorMessage(err?.message);
         else setErrorMessage("Something went wrong");
       } finally {
         setIsLoading(false);
@@ -55,11 +55,11 @@ const Dashboard = () => {
 
         return {
           ...prev,
-          links: prev.links.filter((link) => link.id !== id),
+          links: prev.links.filter((link) => link?.id !== id),
         };
       });
     } catch (err) {
-      if (err instanceof Error) setErrorMessage(err.message);
+      if (err instanceof Error) setErrorMessage(err?.message);
       else setErrorMessage("Something went wrong");
     }
   };
@@ -110,7 +110,7 @@ const Dashboard = () => {
                   Total Clicks
                 </div>
                 <div className="mt-2 text-3xl font-bold text-slate-900">
-                  {dashboardData.stats.totalClicks}
+                  {dashboardData?.stats?.totalClicks}
                 </div>
               </div>
             </div>
@@ -123,7 +123,7 @@ const Dashboard = () => {
                 <div />
               </div>
 
-              {dashboardData.links.map((link) => (
+              {dashboardData?.links?.map((link) => (
                 <div
                   key={link.shortLink}
                   className="grid grid-cols-[2fr_1.5fr_0.5fr_40px] items-center border-b border-slate-100 px-6 py-5 last:border-b-0"
@@ -137,14 +137,14 @@ const Dashboard = () => {
                   </div>
 
                   <div className="font-semibold text-slate-800">
-                    {link.clicks}
+                    {link?.clicks}
                   </div>
 
                   <div className="relative">
                     <button
                       type="button"
                       onClick={() =>
-                        setOpenMenu(openMenu === link.id ? null : link.id)
+                        setOpenMenu(openMenu === link?.id ? null : link?.id)
                       }
                       className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                       aria-label="Link options"
@@ -152,13 +152,13 @@ const Dashboard = () => {
                       <span className="text-xl leading-none">⋮</span>
                     </button>
 
-                    {openMenu === link.id && (
+                    {openMenu === link?.id && (
                       <div className="absolute right-0 top-9 z-10 w-32 rounded-lg border border-slate-200 bg-white py-1 shadow-lg">
                         <button
                           type="button"
                           className="w-full cursor-pointer px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50"
                           onClick={() => {
-                            handleDeleteLink(link.id);
+                            handleDeleteLink(link?.id);
                             setOpenMenu(null);
                           }}
                         >

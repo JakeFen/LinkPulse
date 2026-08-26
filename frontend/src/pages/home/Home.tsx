@@ -10,6 +10,7 @@ const Home = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSlowRequest, setIsSlowRequest] = useState(false);
   const { getToken } = useAuth();
 
   const shortenLink = async (event: React.SubmitEvent<HTMLFormElement>) => {
@@ -17,6 +18,10 @@ const Home = () => {
     setShortURL("");
     setErrorMessage("");
     setIsLoading(true);
+
+    const slowRequestTimer = setTimeout(() => {
+      setIsSlowRequest(true);
+    }, 3000);
 
     try {
       const token = await getToken();
@@ -30,7 +35,9 @@ const Home = () => {
       if (err instanceof Error) setErrorMessage(err.message);
       else setErrorMessage("Something went wrong");
     } finally {
+      clearTimeout(slowRequestTimer);
       setIsLoading(false);
+      setIsSlowRequest(false);
     }
   };
 
@@ -80,15 +87,31 @@ const Home = () => {
               </button>
             </div>
           </form>
+
+          {/* Status Message */}
           <div className="mt-4 min-h-24">
-            {errorMessage && (
-              <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+            {isLoading && (
+              <div className="flex items-start gap-3 rounded-lg border border-indigo-100 bg-indigo-50 px-4 py-3 text-sm text-indigo-700">
+                <div className="mt-0.5 h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-indigo-200 border-t-indigo-600" />
+
+                <div>
+                  <p className="font-medium">
+                    {isSlowRequest
+                      ? "The server may be waking up. This can take up to a minute."
+                      : "Creating your short link..."}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {!isLoading && errorMessage && (
+              <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-700">
                 {errorMessage}
               </div>
             )}
 
-            {shortURL && (
-              <div className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
+            {!isLoading && shortURL && (
+              <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3">
                 <p className="font-semibold text-emerald-700">Success!</p>
 
                 <div className="mt-2 flex flex-col gap-2 sm:flex-row">
@@ -104,7 +127,7 @@ const Home = () => {
                     onClick={copyShortURL}
                     className="cursor-pointer rounded-lg bg-emerald-600 px-5 py-2 font-semibold text-white transition hover:bg-emerald-700"
                   >
-                    {copied ? "Coppied " : "Copy"}
+                    {copied ? "Copied" : "Copy"}
                   </button>
                 </div>
               </div>
