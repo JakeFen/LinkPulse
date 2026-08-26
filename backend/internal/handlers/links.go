@@ -99,7 +99,7 @@ func (h Handler) CreateLinks(w http.ResponseWriter, r *http.Request) {
 
 	response := LinksResponse{
 		ShortCode: shortCode,
-		ShortLink: baseURL + shortCode,
+		ShortLink: baseURL + "/" + shortCode,
 	}
 
 	json.NewEncoder(w).Encode(response)
@@ -186,7 +186,7 @@ func (h Handler) GetLinksByProviderID(w http.ResponseWriter, r *http.Request) {
 
 		baseURL := os.Getenv("BASE_URL")
 
-		link.ShortLink = baseURL + link.ShortCode
+		link.ShortLink = baseURL + "/" + link.ShortCode
 
 		stats.TotalLinks++
 		stats.TotalClicks += link.Clicks
