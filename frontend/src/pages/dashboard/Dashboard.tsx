@@ -115,7 +115,7 @@ const Dashboard = () => {
               </div>
             </div>
 
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <div className="rounded-xl border border-slate-200 bg-white shadow-sm">
               <div className="grid grid-cols-[2fr_1.5fr_0.5fr_40px] border-b border-slate-200 bg-slate-50 px-6 py-4 text-sm font-semibold text-slate-600">
                 <div>Original URL</div>
                 <div>Short Link</div>
