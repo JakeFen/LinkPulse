@@ -12,7 +12,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { getToken } = useAuth();
 
-  const shortenLink = async (event) => {
+  const shortenLink = async (event: React.SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
     setShortURL("");
     setErrorMessage("");
