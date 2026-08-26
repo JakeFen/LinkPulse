@@ -6,7 +6,7 @@ import type { LinkResponse } from "../../types/link";
 import { deleteLink, getLinks } from "../../services/linkService";
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState<LinkResponse | null>({
+  const [dashboardData, setDashboardData] = useState<LinkResponse>({
     links: [],
     stats: {
       totalLinks: 0,
