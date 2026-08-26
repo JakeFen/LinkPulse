@@ -1,12 +1,16 @@
 {
     "rewrites": [
-      {
-        "source": "/:shortCode",
-        "destination": "https://linkpulse-api-wtlm.onrender.com/:shortCode"
-      },
-      {
-        "source": "/(.*)",
-        "destination": "/index.html"
-      }
+        {
+            "source": "/dashboard",
+            "destination": "/index.html"
+        },
+        {
+            "source": "/:shortCode",
+            "destination": "https://linkpulse-api-wtlm.onrender.com/:shortCode"
+        },
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
     ]
-  }
+}
