@@ -1,11 +1,11 @@
 services:
   postgres:
     image: postgres:17
-    container_name: bLink-db
+    container_name: linkpulse-db
     environment:
-      POSTGRES_USER: bLink
-      POSTGRES_PASSWORD: bLink
-      POSTGRES_DB: bLink
+      POSTGRES_USER: linkpulse
+      POSTGRES_PASSWORD: linkpulse
+      POSTGRES_DB: linkpulse
     ports:
       - "5432:5432"
     volumes:

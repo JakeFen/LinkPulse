@@ -17,7 +17,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/JakeFen/bLink/backend/internal/database"
+	"github.com/JakeFen/linkpulse/backend/internal/database"
 	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/jackc/pgx/v5"
 )
@@ -94,6 +94,8 @@ func (h Handler) CreateLinks(w http.ResponseWriter, r *http.Request) {
 	}
 
 	baseURL := os.Getenv("BASE_URL")
+
+	fmt.Println(baseURL)
 
 	response := LinksResponse{
 		ShortCode: shortCode,

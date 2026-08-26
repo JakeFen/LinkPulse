@@ -1,4 +1,4 @@
-module github.com/JakeFen/bLink/backend
+module github.com/JakeFen/linkpulse/backend
 
 go 1.26.6
 

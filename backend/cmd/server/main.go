@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/JakeFen/bLink/backend/internal/auth"
-	"github.com/JakeFen/bLink/backend/internal/database"
-	"github.com/JakeFen/bLink/backend/internal/handlers"
+	"github.com/JakeFen/linkpulse/backend/internal/auth"
+	"github.com/JakeFen/linkpulse/backend/internal/database"
+	"github.com/JakeFen/linkpulse/backend/internal/handlers"
 	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
@@ -58,7 +58,7 @@ func main() {
 
 	// Start the HTTP server and give it our router.
 	// ListenAndServe blocks here while the server is running.
-	log.Println("bLink server running on http://localhost:8080")
+	log.Println("linkpulse server running on http://localhost:8080")
 
 	if err := http.ListenAndServe(":8080", r); err != nil {
 		log.Fatal(err)
