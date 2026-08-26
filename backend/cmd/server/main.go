@@ -11,6 +11,7 @@ import (
 	"github.com/JakeFen/linkpulse/backend/internal/handlers"
 	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 )
 
@@ -23,6 +24,13 @@ func main() {
 
 	// Create the HTTP router that will receive incoming requests
 	r := chi.NewRouter()
+
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://linkpulse-5gpc44zwo-jake-fen.vercel.app"},
+		AllowedMethods:   []string{"GET", "POST", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		AllowCredentials: true,
+	}))
 
 	// Establish a connection to our PostgreSQL database.
 	conn, err := database.Connect()
