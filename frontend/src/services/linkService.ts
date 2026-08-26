@@ -4,7 +4,9 @@ export const createLink = async (
   longURL: string,
   token: string
 ): Promise<Link> => {
-  const response = await fetch("/api/links", {
+  const API_URL = import.meta.env.VITE_API_URL || "";
+
+  const response = await fetch(`${API_URL}/api/links`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -22,7 +24,9 @@ export const createLink = async (
 };
 
 export const getLinks = async (token: string): Promise<LinkResponse> => {
-  const response = await fetch("/api/links", {
+  const API_URL = import.meta.env.VITE_API_URL || "";
+
+  const response = await fetch(`${API_URL}/api/links`, {
     method: "GET",
     headers: {
       Authorization: `Bearer ${token}`,

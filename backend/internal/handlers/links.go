@@ -14,9 +14,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
 	"time"
 
-	"github.com/JakeFen/LinkPulse/backend/internal/database"
+	"github.com/JakeFen/bLink/backend/internal/database"
 	"github.com/clerk/clerk-sdk-go/v2"
 	"github.com/jackc/pgx/v5"
 )
@@ -92,9 +93,11 @@ func (h Handler) CreateLinks(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	baseURL := os.Getenv("BASE_URL")
+
 	response := LinksResponse{
 		ShortCode: shortCode,
-		ShortLink: "http://localhost:8080/" + shortCode,
+		ShortLink: baseURL + shortCode,
 	}
 
 	json.NewEncoder(w).Encode(response)
@@ -179,7 +182,9 @@ func (h Handler) GetLinksByProviderID(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		link.ShortLink = "http://localhost:8080/" + link.ShortCode
+		baseURL := os.Getenv("BASE_URL")
+
+		link.ShortLink = baseURL + link.ShortCode
 
 		stats.TotalLinks++
 		stats.TotalClicks += link.Clicks

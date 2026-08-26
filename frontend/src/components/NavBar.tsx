@@ -6,7 +6,7 @@ const NavBar = () => {
     <nav className="flex justify-between items-center h-16 p-4 border-b border-slate-200 bg-white">
       <div>
         <Link to="/" className="text-2xl text-slate-900 hover:text-indigo-600">
-          LinkPulse
+          bLink
         </Link>
       </div>
       <div className="flex flex-column gap-2">

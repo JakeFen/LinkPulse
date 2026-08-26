@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
+// Used for development
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {

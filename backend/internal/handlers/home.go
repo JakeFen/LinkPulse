@@ -5,5 +5,5 @@ import (
 )
 
 func Home(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello LinkPulse"))
+	w.Write([]byte("Hello bLink"))
 }
