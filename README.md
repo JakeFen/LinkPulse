@@ -89,10 +89,10 @@ go run .
 
 Additional environment variables may be required depending on your local PostgreSQL configuration.
 
-## Future Improvements
+## Planned Improvements
 
-* Link analytics and click tracking
-* User dashboard
-* Custom short URLs
-* Link management
-* Additional link metrics
+- Expand dashboard analytics and reporting
+- Add additional link metrics
+- Add custom URLs for the hosted application
+- Add CI/CD automation
+- Continue improving the dashboard experience
