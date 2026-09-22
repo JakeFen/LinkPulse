@@ -6,8 +6,8 @@ A full-stack URL shortening application built with React, TypeScript, Go, and Po
 
 > ### Demo Account
 >
-> **Email:** `YOUR_DEMO_EMAIL`
-> **Password:** `YOUR_DEMO_PASSWORD`
+> **User Name:** `testuser`
+> **Password:** `626HvHo90w`
 
 ## 🎥 Demo
 Soon
